@@ -6,7 +6,7 @@ from decimal import Decimal, InvalidOperation
 
 def parse_args(args: list[str]) -> dict[str, Decimal]:
     if len(args) == 0 or len(args) % 2 == 1:
-        msg = ('Argumentos devem ser pares de nome e valor da contribuição. Exemplo:\n'
+        msg = ('Forneça pares de nome e valor para cada contribuição. Exemplo:\n'
                '  {} Alice 12.30 Beto 0 Carla 25.1')
         raise TypeError(msg)
     contas = {}
@@ -14,22 +14,20 @@ def parse_args(args: list[str]) -> dict[str, Decimal]:
         try:
             contas[nome] = Decimal(valor)
         except InvalidOperation as e:
-            raise ValueError(f'Argumento inválido: {valor!r} deveria ser um valor numérico.')
+            raise ValueError(f'Argumento inválido: esperava número, veio {valor!r}.')
     return contas
 
 
-def totalizar(contas: dict[str, Decimal])-> Decimal:
-    return sum(contas.values())
-
-
-def extrato(contas: dict[str, Decimal], ideal: Decimal):
+def extrato(contas: dict[str, Decimal], ideal: Decimal) -> list[str]:
+    linhas = []
     for nome, valor in sorted(contas.items()):
         saldo = valor - ideal
         if saldo == 0:
-            print(f'{nome}\t{valor:0.2f}\t\N{CHECK MARK}')
+            linhas.append(f'{nome}\t{valor:6.2f}\t\N{CHECK MARK}')
         else:
-            operação = 'receber' if saldo > 0 else 'pagar'
-            print(f'{nome}\t{valor:0.2f}\t{abs(saldo):0.2f} a {operação}')
+            operação = 'receber' if saldo > 0 else '  pagar'
+            linhas.append(f'{nome}\t{valor:6.2f}   {operação} {abs(saldo):6.2f}')
+    return linhas
 
 
 def main():
@@ -41,12 +39,12 @@ def main():
     except (ValueError) as e:
         print(e)
         sys.exit(-2)
-    total = totalizar(contas)
     print(len(contas), 'participantes.')
-    print(f'Total de contribuições: {total:.2f}')
+    total = sum(contas.values())
+    print(f'Total de contribuições: {total:7.2f}')
     ideal = total / len(contas)
-    print(f'Contribuição ideal:     {ideal:.2f}')
-    extrato(contas, ideal)
+    print(f'Contribuição ideal:      {ideal:6.2f}')
+    print(*extrato(contas, ideal), sep='\n')
 
 
 if __name__ ==  '__main__':
