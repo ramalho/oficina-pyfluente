@@ -30,9 +30,9 @@ def extrato(contas: dict[str, Decimal], ideal: Decimal) -> list[str]:
     return linhas
 
 
-def main():
+def main(entradas: list[str]) -> None:
     try:
-        contas = parse_args(sys.argv[1:])
+        contas = parse_args(entradas)
     except (TypeError) as e:
         print(e.args[0].format(sys.argv[0]))
         sys.exit(-1)
@@ -48,4 +48,4 @@ def main():
 
 
 if __name__ ==  '__main__':
-    main()
+    main(sys.argv[1:])
