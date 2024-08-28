@@ -48,14 +48,17 @@ def search(query: list[str], first=32, last=sys.maxunicode) -> None:
         if name is None:
             continue
         name = name.replace('-', ' ')
-        name = set(name.split())
-        if query <= name:
-            print(f'U+{code:04X}\t{char}\t{unicodedata.name(char)}')
+        name_words = set(name.split())
+        if query <= name_words:
+            yield code, name
 
 
 def main(args: list[str]) -> None:
     if args:
-        search(args)
+        for code, name in search(args):
+            char = chr(code)
+            print(f'U+{code:04X}\t{char}\t{name}')
+
     else:
         print('Please provide words to search.')
 
